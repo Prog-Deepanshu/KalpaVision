@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KalpaVision - Authentication</title>
+    <link rel="stylesheet" href="styling/styles.css">
+    <!-- Favicon Link -->
+    <link rel="icon" href="images/kalpalogo.png" type="image/png"> <!-- Adjust if needed -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCq3AQBhQS84rc-WLI2HmOEyyeWdE7IQY",
+            authDomain: "sangeetprerak.firebaseapp.com",
+            projectId: "sangeetprerak",
+            storageBucket: "sangeetprerak.appspot.com",
+            messagingSenderId: "706155043243",
+            appId: "1:706155043243:web:35441ef3289bdcfa56daee",
+            measurementId: "G-GYNVV49467"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        window.firebaseAuth = auth;
+    </script>
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <img src="images/kalpalogo.png" alt="KalpaVision Logo" class="logo"> <!-- Logo -->
+            <h1>KalpaVision</h1>
+            <div id="login-container">
+                <form id="login-form">
+                    <h2>Login</h2>
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" name="login-email" required>
+                    
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" name="login-password" required>
+                    
+                    <button type="submit">Login</button>
+                    <div id="login-error-message"></div>
+                </form>
+                <p>Don't have an account? <a href="#" id="show-register">Register here</a></p>
+            </div>
+
+            <div id="register-container" style="display: none;">
+                <form id="register-form">
+                    <h2>Register</h2>
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" name="register-email" required>
+                    
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" name="register-password" required>
+                    
+                    <button type="submit">Register</button>
+                    <div id="register-error-message"></div>
+                </form>
+                <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js';
+
+        const auth = window.firebaseAuth;
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            document.getElementById('loading').style.display = 'flex'; // Show loading animation
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    setTimeout(() => { // Optional delay for animation
+                        window.location.href = 'dashboard.html';
+                    }, 1000); // Adjust delay as needed
+                })
+                .catch((error) => {
+                    let errorMessage = 'An error occurred. Please try again.';
+                    if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password.';
+                    } else if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'No user found with this email.';
+                    }
+                    document.getElementById('login-error-message').innerText = errorMessage;
+                })
+                .finally(() => {
+                    document.getElementById('loading').style.display = 'none'; // Hide loading animation
+                });
+        });
+
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            document.getElementById('loading').style.display = 'flex'; // Show loading animation
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    setTimeout(() => { // Optional delay for animation
+                        window.location.href = 'dashboard.html';
+                    }, 1000); // Adjust delay as needed
+                })
+                .catch((error) => {
+                    let errorMessage = 'An error occurred. Please try again.';
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'Email is already in use.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak.';
+                    }
+                    document.getElementById('register-error-message').innerText = errorMessage;
+                })
+                .finally(() => {
+                    document.getElementById('loading').style.display = 'none'; // Hide loading animation
+                });
+        });
+
+        document.getElementById('show-register').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('register-container').style.display = 'block';
+        });
+
+        document.getElementById('show-login').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('register-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
